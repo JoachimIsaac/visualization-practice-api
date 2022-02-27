@@ -59,8 +59,8 @@ async def get_all_measure_dates(slo,measure):
         for date in current_dates:
             dates.add(date)
     dates = list(dates)
-    dates.sort(key=lambda date: int(date[0].split("-")[0]))
-
+    dates = sorted(dates, key=lambda date: int(date[0].split("-")[0]))
+    # print(dates)
     return dates
 
 
