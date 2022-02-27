@@ -51,7 +51,7 @@ six==1.15.0
 sniffio==1.2.0
 starlette==0.17.1
 statsmodels==0.12.1
-TBB==0.1
+# TBB==0.1
 tinydb==4.7.0
 toml==0.10.1
 tqdm==4.54.1
