@@ -1,11 +1,30 @@
 import string
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from tinydb import TinyDB,Query,where
 import shutil
 import json
 import pprint
-#make sure I add a way to encypt the database
+
+
 app = FastAPI()
+
+origins = [
+    "http://localhost.tiangolo.com",
+    "https://localhost.tiangolo.com",
+    "http://localhost",
+    "http://localhost:8080",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+#make sure I add a way to encypt the database
+
 db = TinyDB('db.json')
 backup_db = TinyDB('backup_db.json')
 slo = Query()
