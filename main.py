@@ -50,12 +50,29 @@ async def get_all_slo():
     return all_slo
 
 
+@app.get("/slo/description/{slo}")
+async def get_slo_descritpion(slo):
+    slo = slo.upper()
+    slo_description = dict_db[slo]["description"]
+    return slo_description
+
+
 
 @app.get("/measure/{slo}")
-async def get_measures(slo):
+async def get_measure(slo):
     slo = slo.upper()
     measures = [measure for measure in dict_db[slo]]
     return measures
+
+
+@app.get("/measure/description/{slo}/{measure}")
+async def get_measure_description(slo, measure):
+    slo = slo.upper()
+    measure = measure.upper()
+
+    measure_description = dict_db[slo][measure]["description"]
+
+    return measure_description
 
 
 
@@ -113,5 +130,15 @@ async def get_all_targets(slo:str,measure:str):
     
 
     return targets
+
+
+@app.get("/result/{slo}/{measure}/{target}")
+def get_result_summary(slo:str,measure:str,target:str,date:str):
+    slo = slo.upper()
+    measure = measure.upper()
+    target = target.upper()
+    
+    result_summary = dict_db[slo][measure][target][date]["description"]
+    return result_summary
 
 
