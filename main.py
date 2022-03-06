@@ -82,16 +82,17 @@ async def get_all_measure_dates(slo,measure):
     slo = slo.upper()
     measure = measure.upper()
     targets = dict_db[slo][measure]
-   
+    print(targets)
     for target in targets:
-
+        
         current_dates = dict_db[slo][measure][target]
-
+        # print(current_dates)
         for date in current_dates:
-            dates.add(date)
+            if(len(date) == 5):
+                dates.add(date)
 
     dates = list(dates)
-
+    # print(dates)
     dates.sort(key=lambda date: int(date[0:2]))
     
 
