@@ -27,21 +27,100 @@ slo = Query()
 dict_db = dict(db.all()[0])
 
 # dict_db["S20"] = "It worked!!"
-# # print(dict_db)
-# # for obj in dict_db:
-# #     print(dict_db[obj])
+# print(dict_db)
+# for obj in dict_db:
+#     print(dict_db[obj])
 
 # with open("db.json","r+") as f:
 #     f.truncate(0)
 #     f.close()
 
 
-# db.insert(dict_db)
+db.insert(dict_db)
 # shutil.copyfile('db.json', 'backup_db.json')
-
+# print(dict_db["S1"]["M1"]["T1"])
 
 
 # print(db_json)
+
+
+    
+
+
+
+def get_dates_up_to_end_date(dates,end_date):
+
+    end_index = 0
+
+    for index, date in enumerate(dates):
+
+        if(date == end_date):
+            end_index = index
+
+    result = dates[0:end_index+1] 
+
+    return result
+
+
+def get_all_target_values(slo,measure,target_type):
+
+    target_values = []
+
+    target_obj = dict_db[slo][measure][target_type]
+
+    for date in target_obj:
+       target_value = target_obj[date]["target"]
+
+       target_values.append(target_value)
+
+    return target_values
+
+
+
+def get_all_percentage_met_values(slo,measure,target_type):
+    percentage_met_values = []
+
+    target_obj = dict_db[slo][measure][target_type]
+
+    for date in target_obj:
+
+       percentage_met_value = target_obj[date]["percentage"]
+
+       percentage_met_values.append(percentage_met_value)
+
+    return percentage_met_values
+
+
+def get_most_recent_target_description(slo, measure, target_type):
+
+    most_recent_target_description = ""
+
+    target_obj = dict_db[slo][measure][target_type]
+
+    dates = []
+
+    for date in target_obj:
+        dates.append(date)
+
+    dates.sort(key=lambda date: int(date[0:2]))
+
+    most_recent_target_date = dates[len(dates)-1]
+
+    most_recent_target_description = dict_db[slo][measure][target_type][most_recent_target_date]["description"]
+
+
+    return most_recent_target_description
+
+
+def create_plot_title_multi_target(slo,measure):
+
+    slo_description = dict_db[slo]["description"]
+    get_measure_description = dict_db[slo][measure]["description"]
+
+    title = f"{slo}{measure} T1 & T2 \n {slo_description} & {get_measure_description}"
+
+    return title
+
 
 
 @app.get("/slo/all")
@@ -99,7 +178,7 @@ async def get_all_measure_dates(slo,measure):
     return dates
 
 
-#choose remainer of dates 
+#choose remainder of dates 
 @app.get("/startdate/{slo}/{measure}")
 async def get_all_measure_dates_after_start(slo:str, measure:str, start: str ):
 
@@ -142,4 +221,50 @@ def get_result_summary(slo:str,measure:str,target:str,date:str):
     result_summary = dict_db[slo][measure][target][date]["description"]
     return result_summary
 
+
+
+
+
+
+@app.get("/plot")
+async def get_plot_data(slo:str,measure:str,start_date:str,end_date:str):
+
+    slo = slo.upper()
+    measure = measure.upper()
+    dates_from_start = await get_all_measure_dates_after_start(slo,measure,start_date)
+
+    dates_from_start_to_end = get_dates_up_to_end_date(dates_from_start, end_date)
+
+    #if there are missing dates/percentage/met we have to/fill in the data with fillers like 0, in the correct places.
+    t1_values = get_all_target_values(slo, measure,"T1")
+    t2_values = get_all_target_values(slo, measure, "T2")
+    percentages_met_t1 = get_all_percentage_met_values(
+        slo, measure, "T1")
+    percentages_met_t2 = get_all_percentage_met_values(
+        slo, measure, "T2")
+
+    most_recent_t1_description = get_most_recent_target_description(
+        slo, measure, "T1")
+
+    most_recent_t2_description = get_most_recent_target_description(
+        slo, measure, "T2")
+
+    title = create_plot_title_multi_target(slo, measure)
+
+    plot_data = {
+        "title":title,
+        "dates": dates_from_start_to_end,
+        "T1": t1_values,
+        "T2":t2_values,
+        "percentagesMetT1":percentages_met_t1,
+        "percentagesMetT2":percentages_met_t2,
+        "mostRecentT1Des": most_recent_t1_description,
+        "mostRecentT2Des": most_recent_t2_description
+    }
+
+    return plot_data
+    
+
+
+    
 

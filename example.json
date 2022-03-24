@@ -4,28 +4,34 @@
         "M1":{
            
             "T1":{
-
+                "18-19":{
+                    "target":50,
+                    "num_student":10,
+                    "num_student_met":3,
+                    "percentage":45.0,
+                    "description":"Students want to less homework."
+                },
                 "19-20":{
-                    "target":60,
+                    "target":50,
                     "num_student":50,
                     "num_student_met":35,
-                    "percentage":70.0,
+                    "percentage":42.0,
                     "description":"Students found that they wanted more snacks in class."
                 },
 
                 "20-21":{
-                    "target":40,
+                    "target":50,
                     "num_student":25,
                     "num_student_met":15,
-                    "percentage":60.0,
+                    "percentage":52.0,
                     "description":"Students wanted less homework and more pratical assignments."
                 },
 
                 "21-22":{
-                    "target":30,
-                    "num_student":15,
-                    "num_student_met":15,
-                    "percentage":100.0,
+                    "target":50,
+                    "num_student":10,
+                    "num_student_met":4,
+                    "percentage":43.0,
                     "description":"Students would rather a more modern programming language to be used in class."
                 }
 
@@ -34,27 +40,34 @@
             "T2":{
 
                 "18-19":{
-                    "target":20,
+                    "target":40,
                     "num_student":10,
                     "num_student_met":3,
-                    "percentage":30.0,
+                    "percentage":38.0,
                     "description":"Students want to less homework."
                 },
                 "19-20":{
-                    "target":30,
+                    "target":40,
                     "num_student":20,
                     "num_student_met":12,
-                    "percentage":55.0,
+                    "percentage":45.0,
                     "description":"Students would rather 1 or two larger projects, rather than numerous small projects."
                 },
 
                 "20-21":{
-                    "target":110,
+                    "target":50,
                     "num_student":60,
                     "num_student_met":9,
                     "percentage":15.0,
                     "description":"Students want more juice in class."
 
+                },
+                "21-22":{
+                    "target":40,
+                    "num_student":15,
+                    "num_student_met":15,
+                    "percentage":100.0,
+                    "description":"Students would rather a more modern programming language to be used in class."
                 }
 
             }
