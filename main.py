@@ -99,14 +99,15 @@ def get_most_recent_target_description(slo, measure, target_type):
 
     dates = []
 
-    for date in target_obj:
-        dates.append(date)
+    if(len(target_obj) != 0):
+        for date in target_obj:
+            dates.append(date)
 
-    dates.sort(key=lambda date: int(date[0:2]))
+        dates.sort(key=lambda date: int(date[0:2]))
 
-    most_recent_target_date = dates[len(dates)-1]
+        most_recent_target_date = dates[len(dates)-1]
 
-    most_recent_target_description = dict_db[slo][measure][target_type][most_recent_target_date]["description"]
+        most_recent_target_description = dict_db[slo][measure][target_type][most_recent_target_date]["description"]
 
 
     return most_recent_target_description
