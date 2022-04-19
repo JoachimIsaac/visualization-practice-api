@@ -262,7 +262,24 @@ async def get_plot_data(slo:str,measure:str,start_date:str,end_date:str):
     return plot_data
     
 
+@app.get("/input/options/{slo}/{measure}/{date}")
+async def get_state(slo:str,measure:str,date:str):
 
+    states = []
+    slo = slo.upper()
+    measure = measure.upper()
+
+    if date in dict_db[slo][measure]["T1"]:
+        states.append("Edit T1")
+    else:
+        states.append("Add T1")
+
+    if date in dict_db[slo][measure]["T2"]:
+        states.append("Edit T2")
+    else:
+        states.append("Add T2")
+
+    return states
 
 
 @app.post("/input/{slo}/{measure}/{target}/{date}")
