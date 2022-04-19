@@ -1,5 +1,5 @@
 import string
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from tinydb import TinyDB,Query,where
 import shutil
@@ -30,10 +30,6 @@ dict_db = dict(db.all()[0])
 # print(dict_db)
 # for obj in dict_db:
 #     print(dict_db[obj])
-
-# with open("db.json","r+") as f:
-#     f.truncate(0)
-#     f.close()
 
 
 db.insert(dict_db)
@@ -267,5 +263,78 @@ async def get_plot_data(slo:str,measure:str,start_date:str,end_date:str):
     
 
 
+
+
+@app.post("/input/{slo}/{measure}/{target}/{date}")
+async def add_new_slo_data(slo,measure,date,target,information:Request):
+
+    data = await information.json()
+
+    #would need to check if the date that was passed in is valid also 
+
+    print(type(data))
+    #If there is no date we add it, if a date already exists taht means we need to edit it
+    if(date not in dict_db[slo][measure][target]):
+        
+        dict_db[slo][measure][target][date] = data
+
+        with open("db.json", "r+") as f:
+            f.truncate(0)
+            f.close()
+
+        db.insert(dict_db)
+
+        return {
+            "status":"SUCCESS the data was stored",
+            "data":data
+        }
+
+    else:
+
+        return{
+            "status": "FAILDED the data was not stored, Data on this date is already there",
+            "data": data
+        }
+
+
+
+
+@app.put("/edit/{slo}/{measure}/{target}/{date}")
+async def edit_slo_data(slo, measure, date, target, information: Request):
+    slo = slo.upper()
+    measure = measure.upper()
     
+    data = await information.json()
+
+    #would need to check if the date that was passed in is valid also
+
+    if(date in dict_db[slo][measure][target]):#if a date is there we can edit it , not date would mean we add
+
+        dict_db[slo][measure][target][date] = data
+
+        with open("db.json", "r+") as f:
+            f.truncate(0)
+            f.close()
+
+        db.insert(dict_db)
+
+        return {
+            "status": "SUCCESS the data was edited",
+            "data": data
+        }
+
+    else:
+
+        return{
+            "status": "FAILDED the entry for that date doesn't exist ",
+            "data": data
+
+        }
+
+
+
+
+
+
+
 
