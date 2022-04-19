@@ -349,9 +349,17 @@ async def edit_slo_data(slo, measure, date, target, information: Request):
         }
 
 
+@app.get("/target/T2/exist/{slo}/{measure}")
+def has_two_targets(slo:str,measure:str):
 
+    slo = slo.upper()
+    measure = measure.upper()
 
+    if("T2" in dict_db[slo][measure]):
+        
+        return True
 
-
-
+    else:
+        
+        return False
 
