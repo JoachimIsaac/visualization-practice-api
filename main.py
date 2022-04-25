@@ -234,17 +234,22 @@ async def get_plot_data(slo:str,measure:str,start_date:str,end_date:str):
 
     #if there are missing dates/percentage/met we have to/fill in the data with fillers like 0, in the correct places.
     t1_values = get_all_target_values(slo, measure,"T1")
-    t2_values = get_all_target_values(slo, measure, "T2")
+    
     percentages_met_t1 = get_all_percentage_met_values(
         slo, measure, "T1")
-    percentages_met_t2 = get_all_percentage_met_values(
-        slo, measure, "T2")
+    
 
     most_recent_t1_description = get_most_recent_target_description(
         slo, measure, "T1")
 
-    most_recent_t2_description = get_most_recent_target_description(
-        slo, measure, "T2")
+    most_recent_t2_description =  get_most_recent_target_description(
+        slo, measure, "T2") if has_two_targets(slo, measure) else []
+
+    percentages_met_t2 = get_all_percentage_met_values(
+        slo, measure, "T2") if has_two_targets(slo, measure) else []
+
+    t2_values = get_all_target_values(
+        slo, measure, "T2") if has_two_targets(slo, measure) else []
 
     title = create_plot_title_multi_target(slo, measure)
 
@@ -269,15 +274,18 @@ async def get_state(slo:str,measure:str,date:str):
     slo = slo.upper()
     measure = measure.upper()
 
+    
     if date in dict_db[slo][measure]["T1"]:
         states.append("Edit T1")
     else:
         states.append("Add T1")
 
-    if date in dict_db[slo][measure]["T2"]:
-        states.append("Edit T2")
-    else:
-        states.append("Add T2")
+
+    if "T2" in dict_db[slo][measure]:
+        if date in dict_db[slo][measure]["T2"]:
+            states.append("Edit T2")
+        else:
+            states.append("Add T2")
 
     return states
 
@@ -360,6 +368,6 @@ def has_two_targets(slo:str,measure:str):
         return True
 
     else:
-        
+
         return False
 
