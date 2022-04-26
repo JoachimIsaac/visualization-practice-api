@@ -5,6 +5,7 @@ from tinydb import TinyDB,Query,where
 import shutil
 import json
 import pprint
+import os
 
 
 app = FastAPI()
@@ -21,26 +22,13 @@ app.add_middleware(
 #make sure I add a way to encypt the database
 
 db = TinyDB('db.json')
-backup_db = TinyDB('backup_db.json')
-slo = Query()
 
 dict_db = dict(db.all()[0])
 
-# dict_db["S20"] = "It worked!!"
-# print(dict_db)
-# for obj in dict_db:
-#     print(dict_db[obj])
 
+if os.stat("db.json").st_size != 0:
+    shutil.copyfile('db.json', 'startup_db.json')
 
-db.insert(dict_db)
-# shutil.copyfile('db.json', 'backup_db.json')
-# print(dict_db["S1"]["M1"]["T1"])
-
-
-# print(db_json)
-
-
-    
 
 
 
@@ -114,7 +102,16 @@ def create_plot_title_multi_target(slo,measure):
     slo_description = dict_db[slo]["description"]
     get_measure_description = dict_db[slo][measure]["description"]
 
-    title = f"{slo}{measure} T1 & T2 \n {slo_description} & {get_measure_description}"
+    hasBothTargets = has_two_targets(slo, measure)
+  
+    if(hasBothTargets):
+
+        title = f"{slo}{measure} T1 & T2 \n {slo_description} & {get_measure_description}"
+
+    else:
+
+        title = f"{slo}{measure} T1 \n {slo_description} & {get_measure_description}"
+
 
     return title
 
@@ -296,18 +293,18 @@ async def add_new_slo_data(slo,measure,date,target,information:Request):
     data = await information.json()
 
     #would need to check if the date that was passed in is valid also 
-
-    print(type(data))
     #If there is no date we add it, if a date already exists taht means we need to edit it
     if(date not in dict_db[slo][measure][target]):
         
         dict_db[slo][measure][target][date] = data
 
-        with open("db.json", "r+") as f:
-            f.truncate(0)
-            f.close()
+        if os.stat("db.json").st_size != 0:
+            with open("db.json", "r+") as f:
+                f.truncate(0)
+                f.close()
 
-        db.insert(dict_db)
+            db.insert(dict_db)
+            shutil.copyfile('db.json', 'backup_db.json')
 
         return {
             "status":"SUCCESS the data was stored",
@@ -337,11 +334,13 @@ async def edit_slo_data(slo, measure, date, target, information: Request):
 
         dict_db[slo][measure][target][date] = data
 
-        with open("db.json", "r+") as f:
-            f.truncate(0)
-            f.close()
+        if os.stat("db.json").st_size != 0:
+            with open("db.json", "r+") as f:
+                f.truncate(0)
+                f.close()
 
-        db.insert(dict_db)
+            db.insert(dict_db)
+            shutil.copyfile('db.json', 'backup_db.json')
 
         return {
             "status": "SUCCESS the data was edited",
