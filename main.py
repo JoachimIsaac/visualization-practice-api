@@ -61,7 +61,8 @@ def get_all_target_values(slo,measure,target_type):
 
 
 
-def get_all_percentage_met_values(slo,measure,target_type):
+
+def get_all_percentage_met_values(slo, measure, target_type):
     percentage_met_values = []
 
     target_obj = dict_db[slo][measure][target_type]
@@ -69,32 +70,53 @@ def get_all_percentage_met_values(slo,measure,target_type):
     for date in target_obj:
 
        percentage_met_value = target_obj[date]["percentage"]
+       numStudents = target_obj[date]["num_student"]
+       numStudentsMet = target_obj[date]["num_student_met"]
+
+       #-1 means a value wasn't entered
+       #if there was no percentage met value
+       if percentage_met_value == -1:
+
+           #and num_student and num_student_met have values
+           if numStudents != -1 and numStudentsMet != -1:
+               #divide to get percentage met value
+               percentage_met_value = round(
+                   (numStudentsMet/numStudents)*100, 2)
+
+            #else(if num_student and num_student_met == -1)
+           else:
+
+               #set percentage_met_value to 0
+               percentage_met_value = 0
 
        percentage_met_values.append(percentage_met_value)
 
     return percentage_met_values
 
 
-def get_most_recent_target_description(slo, measure, target_type):
 
+
+def get_most_recent_target_description(slo, measure, target_type):
+    
     most_recent_target_description = ""
 
     target_obj = dict_db[slo][measure][target_type]
 
     dates = []
 
-    if(len(target_obj) != 0):
-        for date in target_obj:
-            dates.append(date)
+    for date in target_obj:
+        dates.append(date)
 
-        dates.sort(key=lambda date: int(date[0:2]))
+    dates.sort(key=lambda date: int(date[0:2]))
 
-        most_recent_target_date = dates[len(dates)-1]
+    most_recent_target_date = dates[len(dates)-1]
 
-        most_recent_target_description = dict_db[slo][measure][target_type][most_recent_target_date]["description"]
+    most_recent_target_description = dict_db[slo][measure][target_type][most_recent_target_date]["description"]
 
 
     return most_recent_target_description
+
+
 
 
 def create_plot_title_multi_target(slo,measure):
@@ -155,7 +177,7 @@ async def get_all_measure_dates(slo,measure):
     slo = slo.upper()
     measure = measure.upper()
     targets = dict_db[slo][measure]
-    print(targets)
+    # print(targets)
     for target in targets:
         
         current_dates = dict_db[slo][measure][target]
@@ -190,6 +212,8 @@ async def get_all_measure_dates_after_start(slo:str, measure:str, start: str ):
 
     return results 
     
+
+
 
 @app.get("/targets/{slo}/{measure}")
 async def get_all_targets(slo:str,measure:str):
@@ -350,3 +374,33 @@ def has_two_targets(slo:str,measure:str):
 
         return False
 
+
+
+
+@app.get("/input/options/targets/{slo}/{measure}/{date}")
+async def get_state(slo: str, measure: str, date: str):
+
+    states = []
+    slo = slo.upper()
+    measure = measure.upper()
+
+    if has_two_targets(slo, measure):
+
+        if date in dict_db[slo][measure]["T1"]:
+            states.append("Edit T1")
+        else:
+            states.append("Add T1")
+
+        if "T2" in dict_db[slo][measure]:
+            if date in dict_db[slo][measure]["T2"]:
+                states.append("Edit T2")
+            else:
+                states.append("Add T2")
+    else:
+
+        if date in dict_db[slo][measure]["T1"]:
+            states.append("Edit T1")
+        else:
+            states.append("Add T1")
+
+    return states
